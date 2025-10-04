@@ -1,11 +1,11 @@
 """
-Utility functions - تطبيع النص وأدوات مساعدة
+Utility functions -Text normalization and auxiliary tools
 """
 import re
 import pandas as pd
 
 def normalize_arabic(text: str) -> str:
-    """تطبيع النص العربي"""
+    
     if pd.isna(text):
         return ""
     text = str(text).strip()
@@ -16,27 +16,27 @@ def normalize_arabic(text: str) -> str:
     return text
 
 def extract_numbers(text: str) -> list:
-    """استخراج الأرقام من النص"""
+    
     return [int(n) for n in re.findall(r'\d+', text)]
 
 def clean_sql(sql: str) -> str:
-    """تنظيف SQL"""
+    
     if not sql:
         return None
     
-    # إزالة نص قبل SELECT
+    # Remove text before SELECT
     sql = re.sub(r'^.*?(SELECT)', r'\1', sql, flags=re.IGNORECASE | re.DOTALL)
     
-    # إصلاح ILIKE → LIKE
+    #  ILIKE → LIKE
     sql = re.sub(r'\bILIKE\b', 'LIKE', sql, flags=re.IGNORECASE)
     
-    # تنظيف مسافات
+    # Cleaning spaces
     sql = re.sub(r'\s+', ' ', sql)
     
-    # إزالة فواصل منقوطة متعددة
+    #Remove multiple semicolons
     sql = re.sub(r';+', ';', sql)
     
-    # التأكد من ;
+    # Verify;
     if not sql.endswith(';'):
         sql = sql.rstrip(';') + ';'
     
