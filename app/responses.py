@@ -1,5 +1,5 @@
 """
-Response handling - تنفيذ الاستفسارات
+Response handling 
 """
 import pandas as pd
 from typing import Dict, Any
@@ -9,12 +9,12 @@ from .processing import generate_sql, build_fallback_sql
 from .database import get_connection
 
 def execute_query(question: str) -> Dict[str, Any]:
-    """التنفيذ الرئيسي للاستفسار"""
+    """Main implementation of the query""
     
-    # Layer 1: تصنيف نوع السؤال
+    # Layer 1: 
     intent_type = classify_intent(question)
     
-    # محادثة عادية
+    # Normal conversation
     if intent_type == "chat":
         return {
             'success': True,
@@ -24,7 +24,7 @@ def execute_query(question: str) -> Dict[str, Any]:
             'results': None
         }
     
-    # سؤال خارج النطاق
+    #Out of scope question
     if intent_type == "general":
         return {
             'success': False,
@@ -34,21 +34,21 @@ def execute_query(question: str) -> Dict[str, Any]:
             'results': None
         }
     
-    # استفسار SQL
-    # Layer 3: استخراج الكيانات
+    
+    # Layer 3:
     entities = extract_entities(question)
     
-    # Layer 2: تحديد نوع الاستعلام
+    # Layer 2:
     query_intent = determine_intent(question, entities)
     
-    # Layer 4: تحليل السياق
+    # Layer 4: 
     context = analyze_context(question, entities, query_intent)
     
-    # Layer 5 & 6 & 7: توليد SQL
+    # Layer 5 & 6 & 7: generate SQL
     result = generate_sql(question, entities, query_intent, context)
     final_sql = result.get('sql')
     
-    # Fallback إذا فشل التوليد
+    # Fallback( If  generate_sql fails)
     if not final_sql:
         print("Using fallback SQL...")
         final_sql = build_fallback_sql(question, entities, query_intent)
@@ -68,7 +68,7 @@ def execute_query(question: str) -> Dict[str, Any]:
         df = pd.read_sql(final_sql, conn)
         results = df.to_dict('records')
         
-        # تنسيق الإجابة
+        # Answer format
         if len(results) == 1 and len(results[0]) == 1:
             value = list(results[0].values())[0]
             answer = f"النتيجة: {value}"
