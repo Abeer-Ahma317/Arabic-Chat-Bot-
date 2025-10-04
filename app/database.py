@@ -12,7 +12,6 @@ CONN = None
 SCHEMA_DICT = {}
 
 def add_age_column():
-    """إضافة وحساب عمود العمر"""
     try:
         cursor = CONN.cursor()
         cursor.execute("PRAGMA table_info(Students)")
@@ -59,7 +58,7 @@ def build_schema():
     print(f"  - Schema built for {len(SCHEMA_DICT)} tables")
 
 def initialize_database():
-    """تهيئة قاعدة البيانات"""
+
     global CONN
 
     if not os.path.exists(DB_PATH):
@@ -77,9 +76,9 @@ def initialize_database():
         return False
 
 def get_connection():
-    """الحصول على الاتصال الحالي"""
+   
     return CONN
 
 def get_schema():
-    """الحصول على Schema"""
+   
     return SCHEMA_DICT
