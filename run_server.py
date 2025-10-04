@@ -1,5 +1,5 @@
 """
-Server runner - تشغيل السيرفر
+Server runner 
 """
 import uvicorn
 
