@@ -11,7 +11,7 @@ PHI2_TOKENIZER = None
 SQLCODER_PIPELINE = None
 
 def load_phi2_model():
-    """تحميل Phi-2 للمحادثة والتصنيف"""
+   """Download Phi-2 Conversation and Classification"""
     global PHI2_MODEL, PHI2_TOKENIZER
     
     try:
@@ -33,7 +33,7 @@ def load_phi2_model():
         return False
 
 def load_sqlcoder_model():
-    """تحميل SQLCoder-7B"""
+    """Download SQLCoder-7B"""
     global SQLCODER_PIPELINE
     
     try:
@@ -69,20 +69,20 @@ def load_sqlcoder_model():
         return False
 
 def get_phi2_model():
-    """الحصول على Phi-2 model"""
+    """Get the Phi-2 model"""
     return PHI2_MODEL, PHI2_TOKENIZER
 
 def get_sqlcoder_pipeline():
-    """الحصول على SQLCoder pipeline"""
+    """Get the SQLCoder pipeline"""
     return SQLCODER_PIPELINE
 
 def classify_intent(user_text: str) -> str:
-    """تصنيف نية المستخدم"""
+   """User intent classification"""
     lower_text = user_text.lower()
     
     chat_keywords = ['مرحبا', 'اهلا', 'السلام', 'صباح', 'مساء', 'كيف حالك',
                     'شو اخبارك', 'هاي', 'هلا', 'شكرا', 'باي', 'وداعا',
-                    'من انت', 'شو انت', 'كيفك']
+                    'من انت', 'شو انت', 'كيفك','كيف الحال ']
     
     if any(kw in lower_text for kw in chat_keywords):
         return "chat"
@@ -96,7 +96,7 @@ def classify_intent(user_text: str) -> str:
     return "general"
 
 def chat_response(user_text: str) -> str:
-    """ردود المحادثة"""
+    """Chat Replies"""
     lower_text = user_text.lower()
     
     if any(w in lower_text for w in ['مرحبا', 'اهلا', 'السلام', 'هاي', 'هلا']):
