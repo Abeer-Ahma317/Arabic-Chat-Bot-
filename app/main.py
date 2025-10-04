@@ -1,5 +1,5 @@
 """
-FastAPI Application - نقطة الدخول الرئيسية
+FastAPI Application 
 """
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -13,7 +13,6 @@ app = FastAPI(title="Smart Chatbot - Phi-2 + SQLCoder")
 
 @app.on_event("startup")
 async def startup_event():
-    """تشغيل عند بدء التطبيق"""
     print("\n" + "="*70)
     print("SMART CHATBOT STARTUP")
     print("="*70)
@@ -41,18 +40,18 @@ async def startup_event():
 
 @app.get("/")
 def home():
-    """الصفحة الرئيسية"""
+    """page home"""
     with open("templates/chat.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 @app.get("/ping")
 def ping():
-    """فحص حالة السيرفر"""
+    """Check server status"""
     return {"status": "ok", "message": "Bot is running"}
 
 @app.post("/ask")
 async def ask(request: dict):
-    """معالجة السؤال"""
+   """Processing the question"""
     question = request.get('question', '').strip()
     
     if not question:
@@ -77,7 +76,7 @@ async def ask(request: dict):
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request, exc):
-    """معالج الأخطاء العام"""
+  """General error handler"""
     print(f"Unhandled exception: {exc}")
     return JSONResponse(
         status_code=500,
