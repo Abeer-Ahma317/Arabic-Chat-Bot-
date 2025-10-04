@@ -9,7 +9,7 @@ from .utils import clean_sql
 def build_prompt(question: str, entities: Dict, intent: str, context: Dict) -> str:
     """Layer 6: بناء Prompt لـ SQLCoder"""
     
-    # Schema كامل - هذا مهم جداً للنموذج
+    # Schema 
     schema = """CREATE TABLE Students (
   national_id TEXT PRIMARY KEY,
   first_name TEXT,
@@ -93,7 +93,7 @@ SELECT"""
 
 
 def extract_sql(response: str) -> str:
-    """Layer 7: استخراج SQL من الاستجابة"""
+    """Layer 7: Extract SQL from the response"""
     if not response:
         return None
 
@@ -119,16 +119,16 @@ def extract_sql(response: str) -> str:
 
 
 def generate_sql(question: str, entities: Dict, intent: str, context: Dict) -> Dict[str, Any]:
-    """توليد SQL باستخدام SQLCoder"""
+    """Generate SQL using SQLCoder""
     
     print(f"\nProcessing: {question}")
     print(f"Intent: {intent}")
     print(f"Tables: {context['required_tables']}")
     
-    # Layer 6: بناء Prompt
+    # Layer 6: build  Prompt
     prompt = build_prompt(question, entities, intent, context)
     
-    # استدعاء النموذج
+    # import model 
     pipeline = get_sqlcoder_pipeline()
     if not pipeline:
         return {'sql': None, 'method': 'no_model'}
@@ -137,7 +137,7 @@ def generate_sql(question: str, entities: Dict, intent: str, context: Dict) -> D
         response = pipeline(prompt, max_new_tokens=200)
         raw = response[0].get('generated_text', '') if isinstance(response, list) else str(response)
         
-        # Layer 7: استخراج SQL
+        # Layer 7:extract  SQL
         sql = extract_sql(raw)
         
         if sql:
@@ -154,11 +154,11 @@ def generate_sql(question: str, entities: Dict, intent: str, context: Dict) -> D
 
 
 def build_fallback_sql(question: str, entities: Dict, intent: str) -> str:
-    """بناء SQL احتياطي بسيط"""
+    """Building a simple SQL backup"""
     text = question.lower()
     conditions = []
     
-    # إضافة الشروط
+    # add condition 
     if entities.get('gender'):
         conditions.append(f"gender = '{entities['gender']}'")
     
@@ -176,11 +176,11 @@ def build_fallback_sql(question: str, entities: Dict, intent: str) -> str:
     
     where = " AND ".join(conditions) if conditions else "1=1"
     
-    # إضافة المنطقة
+    # add area
     if entities.get('region'):
         where += f" AND residence_location_id IN (SELECT id FROM Locations WHERE region LIKE '%{entities['region']}%')"
     
-    # بناء الاستعلام حسب النوع
+    # Construct the query by type
     if intent == 'COUNT' or 'كم' in text or 'عدد' in text:
         return f"SELECT COUNT(*) FROM Students WHERE {where};"
     elif intent == 'LIST' or 'اسماء' in text or 'اعرض' in text:
