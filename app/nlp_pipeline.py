@@ -6,7 +6,7 @@ import pandas as pd
 from typing import Dict, List, Any
 SCHEMA_DICT = {}
 def normalize_arabic(text: str) -> str:
-    """تطبيع النص العربي"""
+    """Normalization of the Arabic text"""
     if pd.isna(text):
         return ""
     text = str(text).strip()
@@ -17,7 +17,7 @@ def normalize_arabic(text: str) -> str:
     return text
 
 def layer1_text_normalization(question: str) -> Dict[str, Any]:
-    """الطبقة 1: تطبيع النص"""
+    """Layer 1: Text normalization"""
     normalized = normalize_arabic(question)
     tokens = [w.strip() for w in normalized.split() if w.strip()]
     numbers = [int(n) for n in re.findall(r'\d+', normalized)]
@@ -30,7 +30,7 @@ def layer1_text_normalization(question: str) -> Dict[str, Any]:
     }
 
 def layer2_intent_classification(processed_text: Dict[str, Any]) -> Dict[str, Any]:
-    """الطبقة 2: تصنيف النية"""
+    """Layer 2: Intent Classification"""
     text = processed_text['normalized'].lower()
 
     patterns = {
@@ -61,7 +61,7 @@ def layer2_intent_classification(processed_text: Dict[str, Any]) -> Dict[str, An
     }
 
 def layer3_entity_recognition(processed_text: Dict[str, Any]) -> Dict[str, Any]:
-    """الطبقة 3: استخراج الكيانات"""
+    """Layer 3: Entity Extraction"""
     text = processed_text['normalized'].lower()
     entities = []
 
@@ -187,7 +187,7 @@ def layer3_entity_recognition(processed_text: Dict[str, Any]) -> Dict[str, Any]:
     return {'entities': entities}
 
 def layer4_context_analysis(text_data: Dict, intent: Dict, entities: Dict) -> Dict:
-    """الطبقة 4: تحليل السياق"""
+    """Layer 4: Context Analysis"""
     text = text_data['normalized'].lower()
 
     indicators = {
@@ -221,7 +221,7 @@ print("✓ Layers 1-4 defined")
 # ============================================================================
 
 def layer5_schema_mapping(context: Dict) -> Dict:
-    """الطبقة 5: ربط بالسكيما"""
+    """Layer 5: Schema binding""
     return {
         'relationships': [
             "Students.residence_location_id = Locations.id",
@@ -231,7 +231,7 @@ def layer5_schema_mapping(context: Dict) -> Dict:
     }
 
 def get_simplified_schema(required_tables: List[str]) -> str:
-    """استخراج schema للجداول المطلوبة فقط"""
+    """Extract schema for required tables only"""
     simplified = ""
 
     for table in required_tables:
@@ -247,9 +247,6 @@ def get_simplified_schema(required_tables: List[str]) -> str:
 
     return simplified
 
-# ============================================================================
-# Wrapper Functions (للتوافق مع الكود القديم)
-# ============================================================================
 def extract_entities(text: str) -> Dict[str, Any]:
     """Wrapper للطبقة 3"""
     return layer3_entity_recognition(text)
