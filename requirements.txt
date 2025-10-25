@@ -1,0 +1,36 @@
+# AI and Machine Learning
+torch==2.1.0
+transformers==4.35.0
+accelerate==0.24.1
+bitsandbytes==0.41.1
+
+# Data Processing
+pandas==2.1.2
+rapidfuzz==3.0.0
+sqlparse==0.4.4
+
+# Database
+mysql-connector-python==8.2.0
+SQLAlchemy==2.0.23
+
+# Web Framework
+fastapi==0.104.1
+uvicorn==0.24.0
+nest-asyncio==1.5.8
+pyngrok==7.0.0
+python-dotenv==1.0.0
+
+# Additional Dependencies
+python-multipart==0.0.6
+typing-extensions==4.8.0
+pydantic==2.4.2
+
+SQLAlchemy==2.0.23SQLAlchemy
+
+fastapi==0.104.1fastapi
+
+uvicorn==0.24.0uvicorn
+
+nest-asyncio==1.5.8nest-asyncio
+
+pyngrok==7.0.0pyngrok

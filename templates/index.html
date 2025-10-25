@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شات بوت ذكي - SQLCoder</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
+        
+        .chat-container {
+            width: 90%; 
+            max-width: 900px; 
+            height: 90vh; 
+            background: white;
+            border-radius: 20px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            padding: 20px; 
+            text-align: center;
+        }
+        
+        .chat-header h1 { 
+            font-size: 24px; 
+            margin-bottom: 5px; 
+        }
+        
+        .chat-header p { 
+            font-size: 12px; 
+            opacity: 0.9; 
+        }
+        
+        .chat-messages {
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto;
+            background: #f8f9fa; 
+            scroll-behavior: smooth;
+        }
+        
+        .message {
+            margin-bottom: 20px; 
+            display: flex;
+            animation: fadeIn 0.4s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(15px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .message.user { 
+            justify-content: flex-end; 
+        }
+        
+        .message.bot { 
+            justify-content: flex-start; 
+        }
+        
+        .message-content {
+            max-width: 75%; 
+            padding: 15px 20px; 
+            border-radius: 18px;
+            word-wrap: break-word; 
+            white-space: pre-wrap; 
+            line-height: 1.6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.bot .message-content {
+            background: white; 
+            color: #333;
+            border: 1px solid #e0e0e0; 
+            border-bottom-left-radius: 4px;
+        }
+        
+        .sql-result {
+            background: #f0f4f8; 
+            padding: 12px; 
+            border-radius: 8px;
+            margin-top: 12px; 
+            font-family: 'Courier New', monospace;
+            font-size: 13px; 
+            direction: ltr; 
+            text-align: left;
+            border-left: 4px solid #667eea; 
+            overflow-x: auto;
+        }
+        
+        .result-table {
+            width: 100%; 
+            margin-top: 12px; 
+            border-collapse: collapse;
+            font-size: 13px; 
+            direction: rtl;
+        }
+        
+        .result-table th, 
+        .result-table td {
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            text-align: right;
+        }
+        
+        .result-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            font-weight: 600;
+        }
+        
+        .result-table tr:nth-child(even) { 
+            background: #f9f9f9; 
+        }
+        
+        .result-table tr:hover { 
+            background: #f0f4ff; 
+        }
+        
+        .chat-input-area {
+            padding: 20px; 
+            background: white;
+            border-top: 2px solid #e0e0e0; 
+            display: flex; 
+            gap: 12px;
+        }
+        
+        #userInput {
+            flex: 1; 
+            padding: 14px 20px; 
+            border: 2px solid #e0e0e0;
+            border-radius: 25px; 
+            font-size: 16px; 
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        #userInput:focus { 
+            border-color: #667eea; 
+        }
+        
+        #sendButton {
+            padding: 14px 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 25px;
+            font-size: 16px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        #sendButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        #sendButton:active { 
+            transform: translateY(0); 
+        }
+        
+        #sendButton:disabled {
+            opacity: 0.6; 
+            cursor: not-allowed; 
+            transform: none;
+        }
+        
+        .loading {
+            display: inline-block; 
+            width: 8px; 
+            height: 8px;
+            border-radius: 50%; 
+            background: #667eea;
+            animation: loading 1.4s infinite ease-in-out both;
+            margin: 0 2px;
+        }
+        
+        .loading:nth-child(1) { 
+            animation-delay: -0.32s; 
+        }
+        
+        .loading:nth-child(2) { 
+            animation-delay: -0.16s; 
+        }
+        
+        @keyframes loading {
+            0%, 80%, 100% { 
+                transform: scale(0); 
+            }
+            40% { 
+                transform: scale(1); 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 شات بوت ذكي</h1>
+            <p>Powered by SQLCoder-7B</p>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="اكتب سؤالك هنا... (مثال: كم عدد الطلاب؟)">
+            <button id="sendButton">إرسال</button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        function addMessage(text, isUser, sqlResult = null, resultData = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = text;
+
+            if (sqlResult) {
+                const sqlDiv = document.createElement('div');
+                sqlDiv.className = 'sql-result';
+                sqlDiv.innerHTML = `<strong>📝 SQL Query:</strong><br>${sqlResult}`;
+                contentDiv.appendChild(sqlDiv);
+            }
+
+            if (resultData && resultData.length > 0) {
+                const keys = Object.keys(resultData[0]);
+                let html = '<table class="result-table"><thead><tr>';
+                keys.forEach(key => { 
+                    html += `<th>${key}</th>`; 
+                });
+                html += '</tr></thead><tbody>';
+                
+                resultData.slice(0, 50).forEach(row => {
+                    html += '<tr>';
+                    keys.forEach(key => {
+                        const value = row[key] !== null ? row[key] : '-';
+                        html += `<td>${value}</td>`;
+                    });
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+                
+                if (resultData.length > 50) {
+                    html += `<p style="margin-top:10px; font-size:12px; color:#666;">
+                              عرض 50 من ${resultData.length} نتيجة
+                            </p>`;
+                }
+                contentDiv.innerHTML += html;
+            }
+
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addLoadingMessage() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            messageDiv.id = 'loadingMessage';
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = 'جاري المعالجة <span class="loading"></span><span class="loading"></span><span class="loading"></span>';
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeLoadingMessage() {
+            const loading = document.getElementById('loadingMessage');
+            if (loading) loading.remove();
+        }
+
+        async function processQuestion(question) {
+            addMessage(question, true);
+            addLoadingMessage();
+            sendButton.disabled = true;
+            sendButton.textContent = 'جاري المعالجة...';
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+                const data = await response.json();
+                removeLoadingMessage();
+                addMessage(data.answer, false, data.sql, data.results);
+            } catch (error) {
+                removeLoadingMessage();
+                addMessage('❌ عذراً، حدث خطأ في الاتصال بالسيرفر', false);
+                console.error('Error:', error);
+            }
+
+            sendButton.disabled = false;
+            sendButton.textContent = 'إرسال';
+        }
+
+        async function handleSend() {
+            const question = userInput.value.trim();
+            if (!question || sendButton.disabled) return;
+            userInput.value = '';
+            await processQuestion(question);
+        }
+
+        sendButton.addEventListener('click', handleSend);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !sendButton.disabled) handleSend();
+        });
+
+        // رسالة ترحيبية
+        addMessage(`مرحباً! 👋 أنا بوت ذكي للاستعلام عن قاعدة البيانات
+
+💡 جرب هذه الأسئلة:
+• مرحباً / كيف حالك؟
+• كم عدد الطلاب؟
+• من الطلاب اللي عمرهم أكبر من 25؟
+• كم عدد الإناث من الشمال؟
+• اعرض أسماء الطلاب`, false);
+    </script>
+</body>
+</html>
